@@ -7,8 +7,8 @@ from astrbot.api import AstrBotConfig, logger
 from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, register
 
-# ModelScope API-Inference 基础地址
-MODELSCOPE_API_BASE = "https://api-inference.modelscope.cn/"
+# ModelScope API-Inference 默认基础地址（国际版）。可在配置中切换为国内版 .cn。
+DEFAULT_API_BASE = "https://api-inference.modelscope.ai/"
 
 
 @register(
@@ -27,6 +27,13 @@ class ModelScopeImagePlugin(Star):
         """读取并校验 ModelScope Token。"""
         token = (self.config.get("modelscope_token") or "").strip()
         return token
+
+    def _get_api_base(self) -> str:
+        """读取 API-Inference 基础地址，确保以 / 结尾。"""
+        base = (self.config.get("api_base") or DEFAULT_API_BASE).strip()
+        if not base.endswith("/"):
+            base += "/"
+        return base
 
     async def _generate_image(self, prompt: str, model: str, size: str) -> str:
         """
@@ -48,6 +55,7 @@ class ModelScopeImagePlugin(Star):
         timeout_seconds = int(self.config.get("request_timeout", 60))
         poll_interval = int(self.config.get("poll_interval", 5))
         max_attempts = int(self.config.get("max_attempts", 60))
+        api_base = self._get_api_base()
 
         common_headers = {
             "Authorization": f"Bearer {token}",
@@ -62,7 +70,7 @@ class ModelScopeImagePlugin(Star):
             logger.info(f"[ModelScope生图] 提交任务 model={model} size={size} prompt={prompt}")
 
             async with session.post(
-                f"{MODELSCOPE_API_BASE}v1/images/generations",
+                f"{api_base}v1/images/generations",
                 headers=submit_headers,
                 data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
             ) as resp:
@@ -86,7 +94,7 @@ class ModelScopeImagePlugin(Star):
             for attempt in range(1, max_attempts + 1):
                 await asyncio.sleep(poll_interval)
                 async with session.get(
-                    f"{MODELSCOPE_API_BASE}v1/tasks/{task_id}",
+                    f"{api_base}v1/tasks/{task_id}",
                     headers=poll_headers,
                 ) as resp:
                     body = await resp.text()
@@ -158,7 +166,8 @@ class ModelScopeImagePlugin(Star):
         size = self.config.get("default_size", "1024x1024")
         configured = "已配置" if self._get_token() else "未配置"
         yield event.plain_result(
-            f"当前生图配置：\nToken：{configured}\n模型：{model}\n分辨率：{size}"
+            f"当前生图配置：\n接口地址：{self._get_api_base()}\n"
+            f"Token：{configured}\n模型：{model}\n分辨率：{size}"
         )
 
     async def terminate(self):

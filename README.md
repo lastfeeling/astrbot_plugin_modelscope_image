@@ -21,7 +21,8 @@
 
 | 配置项 | 类型 | 默认值 | 是否必填 | 说明 |
 |--------|------|--------|---------|------|
-| `modelscope_token` | string | `""` | ✅ 必填 | ModelScope 访问令牌，用于调用 API-Inference |
+| `api_base` | string | `https://api-inference.modelscope.ai/` | 否 | API-Inference 接口地址（区域），国际版 `.ai` 或国内版 `.cn` |
+| `modelscope_token` | string | `""` | ✅ 必填 | ModelScope 访问令牌，需与所选区域一致 |
 | `default_model` | string | `Qwen/Qwen-Image` | 否 | 默认使用的文生图模型 ID |
 | `default_size` | string | `1024x1024` | 否 | 默认生成分辨率，格式 `宽x高` |
 | `poll_interval` | int | `5` | 否 | 轮询任务状态的间隔（秒） |
@@ -30,10 +31,19 @@
 
 ### 详细说明
 
+**api_base（区域选择）**
+
+- ModelScope 提供两套互相独立的 API-Inference 服务，接口路径与请求格式完全一致，但**账号和 token 不通用**：
+  - 国际版：`https://api-inference.modelscope.ai/`
+  - 国内版：`https://api-inference.modelscope.cn/`
+- 请根据你的账号所在区域选择，并确保 `modelscope_token` 来自同一区域。
+
 **modelscope_token（必填）**
 
 - 唯一必须配置的项，不填则插件无法工作。
-- 获取方式：登录魔搭社区，访问 <https://modelscope.cn/my/myaccesstoken> 创建/复制令牌。
+- 获取方式（与所选区域一致）：
+  - 国际版：<https://modelscope.ai/my/myaccesstoken>
+  - 国内版：<https://modelscope.cn/my/myaccesstoken>
 - 填好后保存配置并重载插件即可生效。
 
 **default_model**
@@ -59,10 +69,19 @@
 
 ### 最小配置示例
 
-实际只需填一个 Token 即可运行，其余保持默认：
+实际只需填一个 Token（默认走国际版 `.ai`）即可运行，其余保持默认：
 
 ```json
 {
+  "modelscope_token": "ms-xxxxxxxxxxxxxxxxxxxxxxxx"
+}
+```
+
+若使用国内版账号，请同时切换区域：
+
+```json
+{
+  "api_base": "https://api-inference.modelscope.cn/",
   "modelscope_token": "ms-xxxxxxxxxxxxxxxxxxxxxxxx"
 }
 ```
@@ -96,7 +115,7 @@
 | 提示「尚未配置 ModelScope Token」 | 未填写 `modelscope_token` | 在配置中填写令牌并重载插件 |
 | 「图片生成失败」 | 模型不支持文生图 / 分辨率超范围 / 提示词违规 | 更换模型、调整 `default_size`、修改提示词 |
 | 「图片生成超时」 | 模型处理较慢 | 调大 `max_attempts` 或稍后重试 |
-| 任务提交失败 (HTTP 401) | Token 无效或过期 | 重新生成令牌 |
+| 任务提交失败 (HTTP 401) | Token 无效或过期，或区域与 token 不匹配 | 重新生成令牌，并确认 `api_base` 与 token 区域一致 |
 
 ## 许可证
 

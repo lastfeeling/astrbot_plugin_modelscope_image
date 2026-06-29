@@ -1,7 +1,17 @@
 {
+  "api_base": {
+    "description": "API-Inference 接口地址（区域）",
+    "hint": "国际版选 .ai，国内版选 .cn。token 必须与所选区域的账号一致，两者不通用。",
+    "type": "string",
+    "options": [
+      "https://api-inference.modelscope.ai/",
+      "https://api-inference.modelscope.cn/"
+    ],
+    "default": "https://api-inference.modelscope.ai/"
+  },
   "modelscope_token": {
     "description": "ModelScope SDK Token",
-    "hint": "在 https://modelscope.cn/my/myaccesstoken 获取，用于调用 API-Inference。",
+    "hint": "国际版在 https://modelscope.ai/my/myaccesstoken 获取，国内版在 https://modelscope.cn/my/myaccesstoken 获取。需与上方所选区域一致。",
     "obvious_hint": true,
     "type": "string",
     "default": ""
