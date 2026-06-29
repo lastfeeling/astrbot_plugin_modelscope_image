@@ -148,7 +148,7 @@ class ModelScopeImagePlugin(Star):
         model = self.config.get("default_model", "Qwen/Qwen-Image")
         size = self.config.get("default_size", "1024x1024")
 
-        yield event.plain_result(f"正在生成图片，请稍候…\n模型：{model}\n提示词：{prompt}")
+        yield event.plain_result("正在生成图片，请稍候…")
 
         try:
             image_url = await self._generate_image(prompt, model, size)
