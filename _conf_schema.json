@@ -1,0 +1,38 @@
+{
+  "modelscope_token": {
+    "description": "ModelScope SDK Token",
+    "hint": "在 https://modelscope.cn/my/myaccesstoken 获取，用于调用 API-Inference。",
+    "obvious_hint": true,
+    "type": "string",
+    "default": ""
+  },
+  "default_model": {
+    "description": "默认文生图模型",
+    "hint": "ModelScope 模型 ID，例如 Qwen/Qwen-Image、MusePublic/489_ckpt_FLUX_1 等。",
+    "type": "string",
+    "default": "Qwen/Qwen-Image"
+  },
+  "default_size": {
+    "description": "默认生成分辨率",
+    "hint": "格式为 宽x高，Qwen-Image 支持范围 [64x64, 1664x1664]。",
+    "type": "string",
+    "default": "1024x1024"
+  },
+  "poll_interval": {
+    "description": "轮询任务状态的间隔（秒）",
+    "hint": "异步任务每隔多少秒查询一次结果。",
+    "type": "int",
+    "default": 5
+  },
+  "max_attempts": {
+    "description": "最大轮询次数",
+    "hint": "超过该次数仍未完成则判定为超时。总等待时间约为 poll_interval * max_attempts 秒。",
+    "type": "int",
+    "default": 60
+  },
+  "request_timeout": {
+    "description": "单次网络请求超时时间（秒）",
+    "type": "int",
+    "default": 60
+  }
+}
